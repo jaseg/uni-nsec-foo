@@ -1,0 +1,14 @@
+---
+# This playbook installs the iptables-persistant package
+- name: install_iptables_persistent
+  apt: pkg=iptables-persistent state=present
+  tags: install_iptables_persistent
+
+- name: Copy iptables template rules over to /etc/iptables
+  template: src=iptables.j2 dest=/etc/iptables/rules.v4
+  notify: restart iptables-persistent
+  tags: iptables_config
+
+- name: Install dnsmasq DNS/DHCP server
+  apt: pkg=dnsmasq state=present
+

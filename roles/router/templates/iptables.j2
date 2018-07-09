@@ -1,0 +1,52 @@
+# ansible managed, do not edit manually.
+#jinja2: trim_blocks: True
+
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:admin - [0:0]
+:webserver - [0:0]
+:client-forward - [0:0]
+:fail2ban-ssh - [0:0]
+
+-A INPUT -p tcp -m multiport --dports 22 -j fail2ban-ssh
+-A INPUT -j logging
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 22 -j admin
+-A INPUT -j DROP
+
+-A fail2ban-ssh -j RETURN
+-A admin -j ACCEPT
+-A webserver -j ACCEPT
+-A client-forward -j ACCEPT
+
+#Ansible template note: indentation for jinja conditionals was not done, cause resulting space characters in the iptables file was causing issues with iptables-restore
+# respond to pings
+-A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+-A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
+
+# allow loopback network
+-A INPUT -i lo -j ACCEPT
+-A OUTPUT -o lo -j ACCEPT
+
+# Allow 
+{% for inventory_hostname in groups['clients'] %}
+-A INPUT -s {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }} -p tcp -m tcp --dport 80 -j client-forward
+-A INPUT -s {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }} -p tcp -m tcp --dport 443 -j client-forward
+{% endfor %}
+
+#\{\%- trims spaces, but ensure the line is separated by an empty line.
+{% if inventory_hostname in groups['webservers'] %}
+-A INPUT -p tcp -m tcp --dport 80 -j application
+-A INPUT -p tcp -m tcp --dport 443 -j application
+{% endif %}
+
+{%if hostvars[inventory_hostname]['custom_iptables_rules'] is defined %}
+{% for rule in hostvars[inventory_hostname]['custom_iptables_rules'] %}
+{{ rule }}
+{% endfor %}
+{% endif %}
+
+COMMIT

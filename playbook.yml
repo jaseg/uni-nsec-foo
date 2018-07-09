@@ -1,0 +1,10 @@
+---
+- hosts: webservers
+  roles:
+    - webserver
+    - router
+
+- hosts: clients
+  tasks:
+    - name: Create mock user accounts
+      user: name=user password=changeme state=present createhome=yes

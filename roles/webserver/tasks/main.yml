@@ -1,0 +1,20 @@
+- name: Install nginx
+  apt: name=nginx state=present
+
+- name: Copy our awesome homepage
+  synchronize: src=www/ dest=/var/www/html/ delete=yes
+
+- name: Copy our awesome homepage
+  synchronize: src=www/ dest=/var/www/html/ delete=yes
+
+- name: Set permissions on web home
+  file: path=/var/www/html owner=root group=root recurse=yes
+
+#- name: Copy nginx configuration
+#  template:
+#    src=nginx.conf
+#- name: Enable nginx service
+#  systemd: name=nginx.service state=enabled
+#
+#- name: Reload nginx service
+#  systemd: name=nginx.service state=reloaded
