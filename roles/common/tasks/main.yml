@@ -1,0 +1,9 @@
+---
+
+- name: Get aptitude for upgrade
+  apt: pkg=aptitude state=present
+
+- name: Safe system upgrade via aptitude
+  apt:
+    update_cache: yes
+    upgrade: safe

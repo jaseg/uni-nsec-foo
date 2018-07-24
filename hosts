@@ -2,6 +2,8 @@
 server ansible_host=10.137.0.45 ansible_user=user ansible_become=yes ansible_become_method=sudo
 client1 ansible_host=10.137.0.46 ansible_user=user ansible_become=yes ansible_become_method=sudo
 client2 ansible_host=10.137.0.47 ansible_user=user ansible_become=yes ansible_become_method=sudo
+local ansible_host=127.0.0.1 ansible_user=vagrant ansible_become=yes ansible_become_method=sudo ansible_ssh_private_key_file=.vagrant/machines/default/virtualbox/private_key ansible_ssh_port=2222
+
 
 [webservers]
 server
@@ -12,3 +14,6 @@ server
 [clients]
 client1
 client2
+
+[vpn]
+local
